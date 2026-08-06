@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مِعيار — تقييم مبادرات التميز</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --navy:#0B2140;
+    --navy-light:#16305A;
+    --teal:#12897F;
+    --teal-soft:#E4F3F1;
+    --gold:#C9A227;
+    --gold-soft:#FBF3DC;
+    --silver:#8E99A6;
+    --silver-soft:#EEF1F3;
+    --bronze:#B5723A;
+    --bronze-soft:#F6E9DD;
+    --bg:#F5F7F8;
+    --card:#FFFFFF;
+    --ink:#16212B;
+    --ink-soft:#5B6B7A;
+    --border:#E1E7EA;
+    --danger:#B94A48;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"IBM Plex Sans Arabic","IBM Plex Sans",sans-serif;
+    min-height:100vh;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 60px;}
+
+  /* Header */
+  .hero{
+    background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 60%,var(--teal) 130%);
+    border-radius:20px;
+    padding:30px 32px;
+    color:#fff;
+    position:relative;
+    overflow:hidden;
+    margin-bottom:16px;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:radial-gradient(circle at 88% 12%, rgba(201,162,39,.35), transparent 45%);
+    pointer-events:none;
+  }
+  .hero-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;position:relative;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand-mark{
+    width:44px;height:44px;border-radius:12px;
+    background:linear-gradient(135deg,var(--gold),#E8CE7A);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;color:var(--navy);font-size:20px;
+    flex-shrink:0;
+  }
+  .brand h1{margin:0;font-size:22px;font-weight:700;letter-spacing:.2px;}
+  .brand span{display:block;font-size:12px;color:#CFE0DC;font-weight:400;margin-top:2px;letter-spacing:.5px;}
+  .award-input{
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:10px;
+    padding:10px 14px;
+    color:#fff;
+    font-family:inherit;
+    font-size:14px;
+    min-width:260px;
+  }
+  .award-input::placeholder{color:#C7D3DC;}
+  .hero-sub{margin-top:16px;color:#D9E4E6;font-size:13.5px;line-height:1.8;max-width:680px;position:relative;}
+
+  /* Context card */
+  .context-toggle{
+    display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;
+  }
+  .context-toggle .t{font-weight:700;font-size:13.5px;color:var(--navy);}
+  .context-toggle .arrow{transition:.2s;color:var(--ink-soft);}
+  .context-toggle.open .arrow{transform:rotate(180deg);}
+  .context-body{margin-top:14px;}
+  .context-body textarea{
+    width:100%;min-height:120px;border:1px solid var(--border);border-radius:10px;
+    padding:12px 14px;font-family:inherit;font-size:13px;line-height:1.9;resize:vertical;color:var(--ink);
+  }
+  .context-hint{font-size:11.5px;color:var(--ink-soft);margin-top:6px;}
+  .evidence-ref{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+  .evidence-chip{
+    font-size:11.5px;background:var(--teal-soft);color:var(--teal);padding:4px 10px;border-radius:20px;
+  }
+
+  /* Tabs */
+  .tabs{display:flex;gap:8px;margin-bottom:20px;}
+  .tab{
+    padding:10px 18px;border-radius:10px;border:1px solid var(--border);
+    background:var(--card);color:var(--ink-soft);font-weight:600;font-size:13.5px;
+    cursor:pointer;transition:.15s;
+  }
+  .tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .tab .count{
+    background:var(--gold);color:var(--navy);border-radius:20px;padding:1px 8px;font-size:11px;margin-inline-start:6px;font-family:"IBM Plex Mono";
+  }
+  .tab.active .count{background:rgba(255,255,255,.25);color:#fff;}
+
+  /* Cards */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;}
+  .card + .card{margin-top:16px;}
+  .field-label{font-weight:600;font-size:13px;margin-bottom:6px;display:block;}
+  .text-input{
+    width:100%;border:1px solid var(--border);border-radius:10px;padding:10px 14px;
+    font-family:inherit;font-size:14px;
+  }
+
+  /* Dropzone */
+  .dropzone{
+    border:2px dashed var(--border);border-radius:var(--radius);
+    padding:30px 20px;text-align:center;cursor:pointer;
+    transition:.15s;background:#FBFCFC;margin-top:16px;
+  }
+  .dropzone:hover, .dropzone.drag{border-color:var(--teal);background:var(--teal-soft);}
+  .dropzone svg{margin-bottom:8px;}
+  .dropzone .title{font-weight:600;font-size:14.5px;margin-bottom:4px;}
+  .dropzone .hint{font-size:12px;color:var(--ink-soft);}
+  input[type=file]{display:none;}
+
+  /* Pending files */
+  .pending-item{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);
+    border-radius:10px;margin-top:8px;background:#FBFCFC;flex-wrap:wrap;
+  }
+  .pending-item .pf-name{font-weight:600;font-size:13px;flex:1;min-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .pf-select{
+    border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-family:inherit;font-size:12.5px;background:#fff;
+  }
+  .pf-del{background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:15px;padding:4px;}
+  .pf-del:hover{color:var(--danger);}
+
+  .coverage-strip{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+  .cov-chip{
+    font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);color:var(--ink-soft);
+  }
+  .cov-chip.on{background:var(--teal-soft);color:var(--teal);border-color:transparent;font-weight:600;}
+
+  .btn-primary{
+    background:var(--navy);color:#fff;border:none;border-radius:10px;padding:12px 22px;
+    font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;margin-top:18px;
+  }
+  .btn-primary:disabled{opacity:.45;cursor:not-allowed;}
+  .btn-primary:hover:not(:disabled){background:var(--navy-light);}
+
+  .status-line{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:13px;color:var(--ink-soft);}
+  .status-line.error{color:var(--danger);}
+  .spinner{
+    width:16px;height:16px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--teal);
+    animation:spin .7s linear infinite;flex-shrink:0;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* Leaderboard */
+  .lb-empty{text-align:center;padding:50px 20px;color:var(--ink-soft);}
+  .lb-row{
+    display:flex;align-items:center;gap:16px;padding:14px 16px;border:1px solid var(--border);
+    border-radius:12px;background:#fff;cursor:pointer;transition:.15s;margin-top:10px;
+  }
+  .lb-row:hover{border-color:var(--teal);box-shadow:0 2px 10px rgba(18,137,127,.08);}
+  .lb-rank{width:30px;text-align:center;font-family:"IBM Plex Mono";font-weight:600;color:var(--ink-soft);flex-shrink:0;}
+  .medal{width:44px;height:44px;flex-shrink:0;}
+  .lb-info{flex:1;min-width:0;}
+  .lb-name{font-weight:600;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .lb-meta{font-size:12px;color:var(--ink-soft);margin-top:3px;}
+  .lb-tag{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-inline-end:6px;}
+  .tag-gold{background:var(--gold-soft);color:#8A6D14;}
+  .tag-silver{background:var(--silver-soft);color:#5A6773;}
+  .tag-bronze{background:var(--bronze-soft);color:#8A4E23;}
+  .tag-mention{background:var(--teal-soft);color:var(--teal);}
+  .tag-none{background:#F2E6E5;color:var(--danger);}
+  .lb-score{font-family:"IBM Plex Mono";font-weight:600;font-size:20px;color:var(--navy);width:64px;text-align:center;flex-shrink:0;}
+  .lb-del{background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:16px;padding:6px;flex-shrink:0;}
+  .lb-del:hover{color:var(--danger);}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+  .btn-ghost{
+    background:none;border:1px solid var(--border);color:var(--ink-soft);border-radius:8px;
+    padding:7px 14px;font-size:12.5px;cursor:pointer;font-family:inherit;
+  }
+  .btn-ghost:hover{border-color:var(--danger);color:var(--danger);}
+
+  /* Detail modal */
+  .overlay{
+    position:fixed;inset:0;background:rgba(11,33,64,.55);display:flex;align-items:flex-start;justify-content:center;
+    padding:40px 16px;overflow-y:auto;z-index:50;
+  }
+  .modal{background:#fff;border-radius:18px;max-width:720px;width:100%;padding:28px;position:relative;}
+  .modal-close{
+    position:absolute;top:18px;left:18px;background:var(--bg);border:none;border-radius:8px;
+    width:32px;height:32px;cursor:pointer;font-size:16px;color:var(--ink-soft);
+  }
+  .modal-head{display:flex;gap:20px;align-items:center;margin-bottom:20px;flex-wrap:wrap;}
+  .gauge-wrap{position:relative;width:110px;height:110px;flex-shrink:0;}
+  .gauge-wrap .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .gauge-wrap .num b{font-family:"IBM Plex Mono";font-size:26px;color:var(--navy);}
+  .gauge-wrap .num small{font-size:10px;color:var(--ink-soft);}
+  .modal-head h2{margin:0 0 6px;font-size:18px;}
+  .criteria-list{margin-top:6px;}
+  .crit-row{margin-bottom:14px;}
+  .crit-top{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;}
+  .crit-top .cname{font-weight:600;}
+  .crit-top .cscore{font-family:"IBM Plex Mono";color:var(--navy);font-weight:600;}
+  .bar-bg{height:7px;background:var(--border);border-radius:20px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--teal),var(--navy));}
+  .crit-note{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+  .section-title{font-weight:700;font-size:13.5px;margin:20px 0 8px;color:var(--navy);}
+  ul.plain{margin:0;padding-inline-start:20px;}
+  ul.plain li{font-size:13px;line-height:1.9;color:var(--ink);}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media (max-width:560px){.two-col{grid-template-columns:1fr;}}
+  .env-warning{
+    background:#FBF3DC;border:1px solid #E8CE7A;color:#8A6D14;border-radius:12px;
+    padding:12px 16px;font-size:13px;line-height:1.8;margin-bottom:16px;
+  }
+  .evidence-check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px;margin-top:8px;}
+  .ev-check{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);}
+  .ev-check.yes{background:var(--teal-soft);border-color:transparent;}
+  .ev-check .mark{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;font-weight:700;}
+  .ev-check.yes .mark{background:var(--teal);color:#fff;}
+  .ev-check.no .mark{background:var(--border);color:var(--ink-soft);}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+const DEFAULT_AWARD_TITLE = "سلسلة رؤى ماستري للتميز لنشر المعرفة";
+const DEFAULT_CONTEXT = `انطلاقاً من التزام شركة ماستري للاستشارات الإدارية بدورها في نشر المعرفة وتعزيز ثقافة التميز المؤسسي، أطلقت الشركة مبادرة "سلسلة رؤى ماستري للتميز"، وهي سلسلة من الأمسيات المعرفية المتخصصة التي تهدف إلى مشاركة أفضل الممارسات والخبرات في مجالات التميز المؤسسي، الاستراتيجية، تجربة المتعاملين، الابتكار، الجودة والاستدامة.
+
+تم تنفيذ أكثر من 10 أمسيات معرفية موجهة إلى أفراد المجتمع وموظفي الجهات الحكومية، بهدف تعزيز التعلم المستمر وبناء القدرات ونقل المعرفة المتخصصة بشكل تطوعي ومتاح للمستفيدين.
+
+الأثر المجتمعي: استفاد أكثر من 400 مشارك من أفراد المجتمع وموظفي المؤسسات الحكومية. رفعت المبادرة الوعي بمفاهيم التميز المؤسسي وتطبيقاته العملية، ودعمت نشر المعرفة المتخصصة وتبادل الخبرات، وعززت ثقافة التطوير المستمر والتعلم مدى الحياة.
+
+مؤشرات الأداء: عدد الأمسيات المنفذة +10، عدد المستفيدين +400، عدد شهادات المشاركة الممنوحة حسب عدد الحضور، ونسبة رضا المشاركين تُقاس عبر استبيانات التقييم.`;
+
+const RUBRIC = [
+  {key:"alignment", name:"الارتباط بأهداف المبادرة والالتزام المؤسسي بنشر المعرفة", weight:10},
+  {key:"impact", name:"الأثر المجتمعي (عدد المستفيدين ونطاق الوصول)", weight:20},
+  {key:"continuity", name:"الانتظام والاستمرارية في تنفيذ الفعاليات", weight:10},
+  {key:"content_quality", name:"جودة المحتوى المعرفي والخبرات المقدَّمة", weight:15},
+  {key:"satisfaction", name:"رضا المشاركين وجودة التجربة", weight:10},
+  {key:"documentation", name:"اكتمال وجودة التوثيق (الأدلة الداعمة)", weight:20},
+  {key:"media_reach", name:"الانتشار الإعلامي والتفاعل الرقمي", weight:10},
+  {key:"sustainability", name:"الاستدامة وقابلية التطوير مستقبلاً", weight:5},
+];
+
+const EVIDENCE_TYPES = [
+  {key:"agenda", label:"أجندات وجدول الأمسيات"},
+  {key:"attendance", label:"قوائم تسجيل وحضور المشاركين"},
+  {key:"photos", label:"صور من الفعاليات"},
+  {key:"presentations", label:"عروض تقديمية ومواد معرفية"},
+  {key:"certificates", label:"شهادات المشاركة"},
+  {key:"satisfaction_forms", label:"نماذج ونتائج تقييم الرضا"},
+  {key:"media", label:"منشورات إعلانية وتغطية إعلامية"},
+  {key:"digital_stats", label:"إحصائيات الوصول والتفاعل الرقمي"},
+  {key:"appreciation", label:"شهادات شكر / خطابات تقدير"},
+  {key:"annual_report", label:"تقرير سنوي"},
+];
+const OTHER_TYPE = {key:"other", label:"نوع آخر / غير محدد"};
+
+const STORAGE_INDEX_KEY = "quality-judge:nominations-index";
+const MAX_CHARS = 14000;
+const MAX_IMAGES = 4;
+
+let ENV_WARNING = null;
+// Standalone build: window.storage is provided by localStorage below (no Claude.ai artifact runtime required).
+(function installLocalStorageBackend(){
+  function skey(key, shared){ return (shared ? "shared:" : "local:") + key; }
+  window.storage = {
+    get: async (key, shared=false) => {
+      const raw = localStorage.getItem(skey(key, shared));
+      if(raw === null) return null;
+      return { key, value: raw, shared: !!shared };
+    },
+    set: async (key, value, shared=false) => {
+      localStorage.setItem(skey(key, shared), value);
+      return { key, value, shared: !!shared };
+    },
+    delete: async (key, shared=false) => {
+      const existed = localStorage.getItem(skey(key, shared)) !== null;
+      localStorage.removeItem(skey(key, shared));
+      return { key, deleted: existed, shared: !!shared };
+    },
+    list: async (prefix="", shared=false) => {
+      const p = skey(prefix, shared);
+      const keys = [];
+      for(let i=0;i<localStorage.length;i++){
+        const k = localStorage.key(i);
+        if(k && k.startsWith(p)) keys.push(k.slice((shared?"shared:":"local:").length));
+      }
+      return { keys, prefix, shared: !!shared };
+    },
+  };
+})();
+
+let state = {
+  tab: "upload",
+  awardTitle: DEFAULT_AWARD_TITLE,
+  context: DEFAULT_CONTEXT,
+  contextOpen: false,
+  nomineeName: "",
+  pending: [],       // {id, file, type}
+  processing: false,
+  processError: null,
+  processStage: "",
+  submissions: [],   // index: {id, name, date, overall, tier}
+  detailId: null,
+  detailData: null,
+};
+
+// ---------- storage helpers ----------
+async function loadIndex(){
+  try{ const r = await window.storage.get(STORAGE_INDEX_KEY, false); return r ? JSON.parse(r.value) : []; }
+  catch(e){ return []; }
+}
+async function saveIndex(list){ await window.storage.set(STORAGE_INDEX_KEY, JSON.stringify(list), false); }
+async function saveSubmission(id, data){ await window.storage.set("quality-judge:nom:"+id, JSON.stringify(data), false); }
+async function loadSubmission(id){ const r = await window.storage.get("quality-judge:nom:"+id, false); return r ? JSON.parse(r.value) : null; }
+async function deleteSubmission(id){ try{ await window.storage.delete("quality-judge:nom:"+id, false); }catch(e){} }
+
+// ---------- classification ----------
+function classify(score){
+  if(score>=90) return {key:"gold", label:"ذهبية", tagClass:"tag-gold"};
+  if(score>=80) return {key:"silver", label:"فضية", tagClass:"tag-silver"};
+  if(score>=70) return {key:"bronze", label:"برونزية", tagClass:"tag-bronze"};
+  if(score>=60) return {key:"mention", label:"تقدير", tagClass:"tag-mention"};
+  return {key:"none", label:"غير مؤهلة", tagClass:"tag-none"};
+}
+function medalSVG(tier){
+  const colors = {
+    gold:["#E8CE7A","#C9A227"], silver:["#D9DEE3","#8E99A6"], bronze:["#D89E6E","#B5723A"],
+    mention:["#7FC7C0","#12897F"], none:["#E3B9B8","#B94A48"],
+  }[tier] || ["#ccc","#999"];
+  return `<svg viewBox="0 0 44 44" class="medal">
+    <circle cx="22" cy="22" r="19" fill="url(#g-${tier})" stroke="${colors[1]}" stroke-width="2"/>
+    <defs><linearGradient id="g-${tier}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${colors[0]}"/><stop offset="100%" stop-color="${colors[1]}"/>
+    </linearGradient></defs>
+    <text x="22" y="27" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="IBM Plex Mono">★</text>
+  </svg>`;
+}
+function gaugeSVG(score){
+  const r = 46, c = 2*Math.PI*r;
+  const pct = Math.max(0,Math.min(100,score))/100;
+  const tier = classify(score).key;
+  const colorMap = {gold:"#C9A227",silver:"#8E99A6",bronze:"#B5723A",mention:"#12897F",none:"#B94A48"};
+  return `<svg viewBox="0 0 110 110" width="110" height="110">
+    <circle cx="55" cy="55" r="${r}" fill="none" stroke="#E1E7EA" stroke-width="9"/>
+    <circle cx="55" cy="55" r="${r}" fill="none" stroke="${colorMap[tier]}" stroke-width="9"
+      stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-pct)}"
+      transform="rotate(-90 55 55)"/>
+  </svg>`;
+}
+
+// ---------- file helpers ----------
+function arrayBufferToBase64(buffer){
+  let binary = "";
+  const bytes = new Uint8Array(buffer);
+  const chunk = 0x8000;
+  for(let i=0;i<bytes.length;i+=chunk){
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+  }
+  return btoa(binary);
+}
+function isImageExt(ext){ return ["jpg","jpeg","png","webp"].includes(ext); }
+function mediaTypeFor(ext){
+  if(ext==="jpg"||ext==="jpeg") return "image/jpeg";
+  if(ext==="png") return "image/png";
+  if(ext==="webp") return "image/webp";
+  return "application/octet-stream";
+}
+
+async function extractText(file){
+  const ext = file.name.split(".").pop().toLowerCase();
+  const buf = await file.arrayBuffer();
+  if(ext === "pdf"){
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    const doc = await pdfjsLib.getDocument({data: buf}).promise;
+    let text = "";
+    const maxPages = Math.min(doc.numPages, 60);
+    for(let i=1;i<=maxPages;i++){
+      const page = await doc.getPage(i);
+      const content = await page.getTextContent();
+      text += content.items.map(it=>it.str).join(" ") + "\n";
+      if(text.length > MAX_CHARS) break;
+    }
+    return text.slice(0, MAX_CHARS);
+  }
+  if(ext === "docx"){
+    const result = await mammoth.extractRawText({arrayBuffer: buf});
+    return result.value.slice(0, MAX_CHARS);
+  }
+  if(ext === "pptx"){
+    const zip = await JSZip.loadAsync(buf);
+    const slideFiles = Object.keys(zip.files)
+      .filter(n => /^ppt\/slides\/slide\d+\.xml$/.test(n))
+      .sort((a,b)=> parseInt(a.match(/slide(\d+)\.xml/)[1]) - parseInt(b.match(/slide(\d+)\.xml/)[1]));
+    let text = "";
+    for(const name of slideFiles){
+      const xml = await zip.files[name].async("string");
+      const matches = xml.match(/<a:t>([^<]*)<\/a:t>/g) || [];
+      text += matches.map(m=>m.replace(/<\/?a:t>/g,"")).join(" ") + "\n";
+      if(text.length > MAX_CHARS) break;
+    }
+    return text.slice(0, MAX_CHARS);
+  }
+  if(ext === "xlsx" || ext === "csv"){
+    const wb = XLSX.read(buf, {type:"array"});
+    let text = "";
+    wb.SheetNames.slice(0,3).forEach(name=>{
+      text += `-- ورقة: ${name} --\n` + XLSX.utils.sheet_to_csv(wb.Sheets[name]) + "\n";
+    });
+    return text.slice(0, MAX_CHARS);
+  }
+  return null; // images / unsupported
+}
+
+// ---------- AI evaluation ----------
+function buildSystemPrompt(coverageSummary){
+  const critList = RUBRIC.map(r=>`- ${r.key} ("${r.name}"، وزنه ${r.weight})`).join("\n");
+  const evList = EVIDENCE_TYPES.map(e=>e.label).join("، ");
+  return `أنت محكّم خبير في جوائز التميز المؤسسي، وتُقيّم ملف ترشيح مبادرة معرفية استناداً إلى الأدلة الداعمة المرفوعة (نصوص مستخرجة من مستندات، وربما صور من الفعاليات).
+
+سياق المبادرة المرجعي الذي قدّمه المُرشِّح:
+"""
+${state.context}
+"""
+
+الأدلة الداعمة القياسية المتوقعة لهذا النوع من المبادرات: ${evList}.
+حالة الأدلة المرفوعة فعلياً في هذا الترشيح: ${coverageSummary}
+
+قيّم الترشيح وفق المعايير التالية فقط، وأعطِ لكل معيار درجة من 0 إلى 10 (يمكن استخدام كسور عشرية)، مع مراعاة حالة اكتمال الأدلة عند تقييم معيار التوثيق تحديداً:
+${critList}
+
+قاعدة إلزامية: يجب عليك دائماً إكمال التقييم وإعادة الكائن الكامل، حتى لو كانت الأدلة المرفوعة قليلة جداً أو ناقصة أو غير مكتملة أو حتى شبه معدومة (أدلة نوع واحد فقط، أو نص قصير جداً، أو صور فقط دون نصوص). لا تمتنع عن التقييم، ولا تطلب مزيداً من الملفات، ولا تكتب أي رسالة اعتذار أو تحفظ بدل الـJSON. في حال نقص الأدلة، اعكس ذلك بدرجات واقعية منخفضة في المعايير المتأثرة فعلياً (خصوصاً "documentation" وما يرتبط مباشرة بالدليل الناقص) مع توضيح سبب انخفاض الدرجة في note، بينما تبقى بقية المعايير مبنية على ما هو متاح فعلاً من نص أو صور. إن لم تتوفر أي نصوص أو صور مفيدة إطلاقاً، أعطِ معظم المعايير درجات منخفضة (0 إلى 3) مع note يوضح "لا توجد أدلة كافية"، لكن أعد دائماً الكائن الكامل بكل المفاتيح الثمانية ولا تترك أي معيار بلا درجة.
+
+أعد النتيجة بصيغة JSON فقط، دون أي نص إضافي أو علامات markdown أو تعليق قبله أو بعده، بالمخطط التالي بالضبط (المفاتيح بالإنجليزية والقيم بالعربية):
+{"criteria":{"alignment":{"score":0,"note":""},"impact":{"score":0,"note":""},"continuity":{"score":0,"note":""},"content_quality":{"score":0,"note":""},"satisfaction":{"score":0,"note":""},"documentation":{"score":0,"note":""},"media_reach":{"score":0,"note":""},"sustainability":{"score":0,"note":""}},"kpi_findings":"","strengths":["",""],"weaknesses":["",""],"recommendations":["",""]}
+
+اجعل كل "note" جملة قصيرة جداً بالعربية (أقل من 14 كلمة). اجعل "kpi_findings" جملة واحدة موجزة تقارن المؤشرات المذكورة في السياق بما تؤكده الأدلة الفعلية، أو تذكر أن الأدلة غير كافية للمقارنة. اجعل strengths وweaknesses ثلاث نقاط كحد أقصى لكل منها (لا تتركها فارغة أبداً — إن كانت الأدلة ضعيفة، اذكر ذلك كنقطة ضعف)، وrecommendations نقطتين كحد أقصى، كلها بالعربية وموجزة.`;
+}
+
+async function evaluateWithAI(nominationName, textBundle, images){
+  const coverageSummary = buildCoverageSummaryText();
+  const contentBlocks = [{
+    type: "text",
+    text: `اسم المبادرة/الترشيح: ${nominationName}\n\nمحتوى الأدلة المستخرجة (نصوص، قد تكون مقتطفة):\n"""\n${textBundle || "(لا توجد نصوص مستخرجة كافية — الاعتماد على الصور المرفقة إن وُجدت)"}\n"""\n\nقيّم هذا الترشيح وأعد JSON فقط.`
+  }];
+  images.slice(0, MAX_IMAGES).forEach(img=>{
+    contentBlocks.push({type:"image", source:{type:"base64", media_type: img.mediaType, data: img.base64}});
+  });
+
+  let resp;
+  try{
+    resp = await fetch("/api/evaluate", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        system: buildSystemPrompt(coverageSummary),
+        messages: [{role: "user", content: contentBlocks}]
+      })
+    });
+  }catch(networkErr){
+    throw new Error("تعذر الاتصال بخدمة التقييم — تحققي من الاتصال وحاولي مرة أخرى");
+  }
+  if(!resp.ok){
+    throw new Error("تعذر إتمام التقييم (خطأ من الخادم) — حاولي مرة أخرى");
+  }
+  const data = await resp.json();
+  const textBlock = (data.content || []).find(b=>b.type==="text");
+  if(!textBlock) throw new Error("لم يصل رد من نموذج التقييم");
+  return parseEvalJSON(textBlock.text);
+}
+
+function parseEvalJSON(raw){
+  let clean = (raw || "").trim().replace(/^```json/i,"").replace(/^```/,"").replace(/```$/,"").trim();
+  let parsed = null;
+  try{ parsed = JSON.parse(clean); }
+  catch(e){
+    const match = clean.match(/\{[\s\S]*\}/);
+    if(match){
+      try{ parsed = JSON.parse(match[0]); }catch(e2){ parsed = null; }
+    }
+  }
+  if(!parsed) parsed = {};
+  // guarantee every criterion exists so an incomplete/refused response still yields a full evaluation
+  const criteria = parsed.criteria || {};
+  RUBRIC.forEach(r=>{
+    const c = criteria[r.key];
+    if(!c || typeof c.score !== "number" || isNaN(c.score)){
+      criteria[r.key] = {score: (c && typeof c.score === "number") ? c.score : 2, note: (c && c.note) || "لا توجد بيانات كافية لهذا المعيار"};
+    }
+  });
+  parsed.criteria = criteria;
+  if(!Array.isArray(parsed.strengths)) parsed.strengths = [];
+  if(!Array.isArray(parsed.weaknesses)) parsed.weaknesses = parsed.strengths.length ? [] : ["الأدلة المتاحة غير كافية لتقييم كامل"];
+  if(!Array.isArray(parsed.recommendations)) parsed.recommendations = [];
+  if(!parsed.kpi_findings) parsed.kpi_findings = "";
+  return parsed;
+}
+
+function computeOverall(criteria){
+  let total = 0;
+  RUBRIC.forEach(r=>{
+    const s = (criteria[r.key] && typeof criteria[r.key].score === "number") ? criteria[r.key].score : 0;
+    total += (s/10) * r.weight;
+  });
+  return Math.round(total*10)/10;
+}
+
+function currentCoverage(){
+  const present = new Set(state.pending.map(p=>p.type).filter(t=>t && t!=="other"));
+  return EVIDENCE_TYPES.map(e=>({...e, covered: present.has(e.key)}));
+}
+function buildCoverageSummaryText(){
+  const cov = currentCoverage();
+  const yes = cov.filter(c=>c.covered).map(c=>c.label);
+  const no = cov.filter(c=>!c.covered).map(c=>c.label);
+  return `متوفر (${yes.length}/10): ${yes.join("، ") || "لا شيء"}. غير متوفر: ${no.join("، ") || "لا شيء"}.`;
+}
+
+// ---------- pending file management ----------
+function guessType(ext){
+  if(isImageExt(ext)) return "photos";
+  if(ext==="pptx") return "presentations";
+  if(ext==="xlsx"||ext==="csv") return "attendance";
+  return "";
+}
+function addPendingFiles(fileList){
+  const accepted = ["pdf","docx","pptx","xlsx","csv","jpg","jpeg","png","webp"];
+  Array.from(fileList).forEach(f=>{
+    const ext = f.name.split(".").pop().toLowerCase();
+    if(!accepted.includes(ext)) return;
+    state.pending.push({id:"pf_"+Date.now()+"_"+Math.random().toString(36).slice(2,7), file:f, type:guessType(ext)});
+  });
+  render();
+}
+function removePending(id){
+  state.pending = state.pending.filter(p=>p.id!==id);
+  render();
+}
+function setPendingType(id, type){
+  const p = state.pending.find(p=>p.id===id);
+  if(p) p.type = type;
+  render();
+}
+
+async function submitNomination(){
+  if(state.processing) return;
+  if(state.pending.length===0) return;
+  if(!state.nomineeName.trim()){
+    state.nomineeName = "ترشيح بدون اسم — " + new Date().toLocaleDateString('ar-EG');
+  }
+  state.processing = true;
+  state.processError = null;
+  state.processStage = "استخراج محتوى الأدلة...";
+  render();
+  try{
+    let textBundle = "";
+    const images = [];
+    for(const p of state.pending){
+      const ext = p.file.name.split(".").pop().toLowerCase();
+      const typeLabel = (EVIDENCE_TYPES.find(e=>e.key===p.type) || OTHER_TYPE).label;
+      if(isImageExt(ext)){
+        if(images.length < MAX_IMAGES){
+          const buf = await p.file.arrayBuffer();
+          images.push({mediaType: mediaTypeFor(ext), base64: arrayBufferToBase64(buf)});
+        }
+      } else {
+        if(textBundle.length < MAX_CHARS){
+          try{
+            const t = await extractText(p.file);
+            if(t) textBundle += `\n== [${typeLabel}] ${p.file.name} ==\n${t}\n`;
+          }catch(e){ /* skip file that fails to parse */ }
+        }
+      }
+    }
+    textBundle = textBundle.slice(0, MAX_CHARS);
+
+    state.processStage = "جاري التقييم بالذكاء الاصطناعي...";
+    render();
+    const evalResult = await evaluateWithAI(state.nomineeName.trim(), textBundle, images);
+    const overall = computeOverall(evalResult.criteria || {});
+    const tier = classify(overall);
+    const id = "nom_" + Date.now() + "_" + Math.random().toString(36).slice(2,8);
+    const record = {
+      id, name: state.nomineeName.trim(), date: new Date().toISOString(),
+      overall, tier: tier.key,
+      criteria: evalResult.criteria || {},
+      kpi_findings: evalResult.kpi_findings || "",
+      strengths: evalResult.strengths || [],
+      weaknesses: evalResult.weaknesses || [],
+      recommendations: evalResult.recommendations || [],
+      coverage: currentCoverage(),
+      fileCount: state.pending.length,
+    };
+    await saveSubmission(id, record);
+    const idx = await loadIndex();
+    idx.push({id, name: record.name, date: record.date, overall, tier: tier.key});
+    await saveIndex(idx);
+    state.submissions = idx;
+    state.pending = [];
+    state.nomineeName = "";
+    state.processing = false;
+    state.processStage = "";
+    state.tab = "board";
+    render();
+  }catch(err){
+    state.processing = false;
+    state.processError = (err && err.message) ? err.message : "حدث خطأ غير متوقع أثناء التقييم";
+    render();
+  }
+}
+
+async function removeSubmission(id){
+  await deleteSubmission(id);
+  const idx = (await loadIndex()).filter(s=>s.id!==id);
+  await saveIndex(idx);
+  state.submissions = idx;
+  render();
+}
+async function clearAll(){
+  const idx = await loadIndex();
+  for(const s of idx) await deleteSubmission(s.id);
+  await saveIndex([]);
+  state.submissions = [];
+  render();
+}
+async function openDetail(id){
+  state.detailId = id; state.detailData = null; render();
+  state.detailData = await loadSubmission(id);
+  render();
+}
+function closeDetail(){ state.detailId = null; state.detailData = null; render(); }
+
+// ---------- render ----------
+function render(){
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    ${ENV_WARNING ? `<div class="env-warning">⚠ ${ENV_WARNING}</div>` : ""}
+    <div class="hero">
+      <div class="hero-top">
+        <div class="brand">
+          <div class="brand-mark">م</div>
+          <div><h1>مِعيار</h1><span>تقييم ملفات ترشيح مبادرات التميز</span></div>
+        </div>
+        <input class="award-input" id="awardTitleInput" placeholder="اسم الجائزة أو المبادرة" value="${escapeAttr(state.awardTitle)}">
+      </div>
+      <div class="hero-sub">ارفعي الأدلة الداعمة لكل مبادرة مرشَّحة (مستندات، جداول حضور، عروض، صور)، وسيقوم النظام بتقييمها آلياً وفق معايير الجائزة، ثم ترتيب المرشّحين في لوحة تصنيف واحدة.</div>
+    </div>
+
+    <div class="card">
+      <div class="context-toggle ${state.contextOpen?'open':''}" id="contextToggle">
+        <span class="t">سياق المبادرة المرجعي (يُستخدم في التقييم) — اضغطي للتعديل</span>
+        <span class="arrow">▾</span>
+      </div>
+      ${state.contextOpen ? `
+        <div class="context-body">
+          <textarea id="contextText">${escapeHtml(state.context)}</textarea>
+          <div class="context-hint">هذا النص يُرسَل للنموذج كمرجعية لتقييم الأثر والمؤشرات. عدّليه عند تقييم مبادرة مختلفة مستقبلاً.</div>
+          <div class="evidence-ref">
+            ${EVIDENCE_TYPES.map(e=>`<span class="evidence-chip">${e.label}</span>`).join("")}
+          </div>
+        </div>
+      ` : ""}
+    </div>
+
+    <div class="tabs" style="margin-top:16px">
+      <button class="tab ${state.tab==='upload'?'active':''}" data-tab="upload">ترشيح جديد</button>
+      <button class="tab ${state.tab==='board'?'active':''}" data-tab="board">لوحة الترشيحات <span class="count">${state.submissions.length}</span></button>
+    </div>
+
+    ${state.tab==='upload' ? renderUpload() : renderBoard()}
+    ${state.detailId ? renderModal() : ""}
+  `;
+  bindEvents();
+}
+
+function renderUpload(){
+  const cov = currentCoverage();
+  return `
+    <div class="card">
+      <label class="field-label">اسم المبادرة / جهة الترشيح (اختياري)</label>
+      <input class="text-input" id="nomineeInput" placeholder="مثال: سلسلة رؤى ماستري للتميز لنشر المعرفة — يمكن تركه فارغاً" value="${escapeAttr(state.nomineeName)}">
+
+      <div class="dropzone" id="dropzone">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#12897F" stroke-width="1.6"><path d="M12 16V4M12 4l-4 4M12 4l4 4M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+        <div class="title">اسحبي أدلة المبادرة هنا أو اضغطي للاختيار</div>
+        <div class="hint">PDF، PPTX، DOCX، XLSX/CSV، صور (JPG/PNG/WEBP) — عدة ملفات دفعة واحدة</div>
+        <input type="file" id="fileInput" multiple accept=".pdf,.pptx,.docx,.xlsx,.csv,.jpg,.jpeg,.png,.webp">
+      </div>
+
+      ${state.pending.length ? `
+        <div style="margin-top:14px">
+          ${state.pending.map(p=>`
+            <div class="pending-item">
+              <span class="pf-name">${escapeHtml(p.file.name)}</span>
+              <select class="pf-select" data-type-for="${p.id}">
+                <option value="">— اختاري نوع الدليل —</option>
+                ${EVIDENCE_TYPES.map(e=>`<option value="${e.key}" ${p.type===e.key?'selected':''}>${e.label}</option>`).join("")}
+                <option value="other" ${p.type==='other'?'selected':''}>${OTHER_TYPE.label}</option>
+              </select>
+              <button class="pf-del" data-remove="${p.id}" title="إزالة">✕</button>
+            </div>
+          `).join("")}
+        </div>
+        <div class="coverage-strip">
+          ${cov.map(c=>`<span class="cov-chip ${c.covered?'on':''}">${c.covered?'✓ ':''}${c.label}</span>`).join("")}
+        </div>
+        <div class="context-hint">لا يشترط توفر كل الأدلة العشرة — يمكن تقييم الترشيح بالأدلة المتاحة فقط، وسينعكس النقص على معيار التوثيق تحديداً وليس على بقية المعايير.</div>
+      ` : ""}
+
+      <button class="btn-primary" id="submitBtn" ${(state.pending.length===0 || state.processing) ? 'disabled' : ''}>
+        ${state.processing ? 'جاري التقييم...' : 'قيّم هذا الترشيح'}
+      </button>
+
+      ${state.processing ? `<div class="status-line"><span class="spinner"></span>${state.processStage}</div>` : ""}
+      ${state.processError ? `<div class="status-line error">⚠ ${escapeHtml(state.processError)}</div>` : ""}
+    </div>
+
+    <div class="card">
+      <div class="section-title" style="margin-top:0">معايير التقييم المعتمدة</div>
+      <div class="rubric-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:12px;">
+        ${RUBRIC.map(r=>`
+          <div class="rubric-item" style="border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:#FBFCFC;">
+            <div style="font-weight:600;font-size:13px">${r.name}</div>
+            <div style="font-family:'IBM Plex Mono';font-size:12px;color:var(--teal);margin-top:4px;">الوزن: ${r.weight}%</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderBoard(){
+  if(state.submissions.length===0){
+    return `<div class="card"><div class="lb-empty">لا توجد ترشيحات مُقيَّمة بعد. ابدئي من تبويب «ترشيح جديد».</div></div>`;
+  }
+  const sorted = state.submissions.slice().sort((a,b)=>b.overall-a.overall);
+  return `
+    <div class="card">
+      <div class="toolbar">
+        <div class="section-title" style="margin:0">${escapeHtml(state.awardTitle) || "لوحة التصنيف"} — ${sorted.length} ترشيح</div>
+        <button class="btn-ghost" id="clearAllBtn">مسح الكل</button>
+      </div>
+      ${sorted.map((s,i)=>{
+        const tier = classify(s.overall);
+        return `
+        <div class="lb-row" data-open="${s.id}">
+          <div class="lb-rank">${i+1}</div>
+          ${medalSVG(tier.key)}
+          <div class="lb-info">
+            <div class="lb-name">${escapeHtml(s.name)}</div>
+            <div class="lb-meta"><span class="lb-tag ${tier.tagClass}">${tier.label}</span>${new Date(s.date).toLocaleDateString('ar-EG')}</div>
+          </div>
+          <div class="lb-score">${s.overall}%</div>
+          <button class="lb-del" data-del="${s.id}" title="حذف">✕</button>
+        </div>`;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderModal(){
+  const d = state.detailData;
+  if(!d){
+    return `<div class="overlay" id="overlay"><div class="modal"><div style="text-align:center;padding:40px 0;color:var(--ink-soft)">جاري التحميل...</div></div></div>`;
+  }
+  const tier = classify(d.overall);
+  return `
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <button class="modal-close" id="closeModal">✕</button>
+      <div class="modal-head">
+        <div class="gauge-wrap">${gaugeSVG(d.overall)}<div class="num"><b>${d.overall}%</b><small>الدرجة الكلية</small></div></div>
+        <div>
+          <h2>${escapeHtml(d.name)}</h2>
+          <span class="lb-tag ${tier.tagClass}">${tier.label}</span>
+          ${d.kpi_findings ? `<div class="crit-note" style="margin-top:8px">📊 ${escapeHtml(d.kpi_findings)}</div>` : ""}
+        </div>
+      </div>
+
+      <div class="section-title">تفصيل المعايير</div>
+      <div class="criteria-list">
+        ${RUBRIC.map(r=>{
+          const c = d.criteria[r.key] || {score:0,note:""};
+          return `
+          <div class="crit-row">
+            <div class="crit-top"><span class="cname">${r.name}</span><span class="cscore">${c.score}/10</span></div>
+            <div class="bar-bg"><div class="bar-fill" style="width:${(c.score/10*100)}%"></div></div>
+            ${c.note ? `<div class="crit-note">${escapeHtml(c.note)}</div>` : ""}
+          </div>`;
+        }).join("")}
+      </div>
+
+      <div class="section-title">اكتمال الأدلة الداعمة</div>
+      <div class="evidence-check-grid">
+        ${(d.coverage||[]).map(c=>`
+          <div class="ev-check ${c.covered?'yes':'no'}">
+            <span class="mark">${c.covered?'✓':'—'}</span>${c.label}
+          </div>
+        `).join("")}
+      </div>
+
+      <div class="two-col" style="margin-top:20px">
+        <div>
+          <div class="section-title" style="margin-top:0">نقاط القوة</div>
+          <ul class="plain">${(d.strengths||[]).map(s=>`<li>${escapeHtml(s)}</li>`).join("") || "<li>—</li>"}</ul>
+        </div>
+        <div>
+          <div class="section-title" style="margin-top:0">نقاط تحتاج تحسيناً</div>
+          <ul class="plain">${(d.weaknesses||[]).map(s=>`<li>${escapeHtml(s)}</li>`).join("") || "<li>—</li>"}</ul>
+        </div>
+      </div>
+      <div class="section-title">توصيات</div>
+      <ul class="plain">${(d.recommendations||[]).map(s=>`<li>${escapeHtml(s)}</li>`).join("") || "<li>—</li>"}</ul>
+    </div>
+  </div>`;
+}
+
+function escapeHtml(s){
+  return String(s??"").replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+function escapeAttr(s){ return escapeHtml(s); }
+
+function bindEvents(){
+  document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click", ()=>{ state.tab = b.dataset.tab; render(); }));
+
+  const awardInput = document.getElementById("awardTitleInput");
+  if(awardInput) awardInput.addEventListener("input", (e)=>{ state.awardTitle = e.target.value; });
+
+  const ctxToggle = document.getElementById("contextToggle");
+  if(ctxToggle) ctxToggle.addEventListener("click", ()=>{ state.contextOpen = !state.contextOpen; render(); });
+  const ctxText = document.getElementById("contextText");
+  if(ctxText) ctxText.addEventListener("input", (e)=>{ state.context = e.target.value; });
+
+  const nomineeInput = document.getElementById("nomineeInput");
+  if(nomineeInput) nomineeInput.addEventListener("input", (e)=>{ state.nomineeName = e.target.value; syncBtn(); });
+
+  const dz = document.getElementById("dropzone");
+  const fi = document.getElementById("fileInput");
+  if(dz && fi){
+    dz.addEventListener("click", ()=>fi.click());
+    fi.addEventListener("change", (e)=>{ addPendingFiles(e.target.files); fi.value=""; });
+    dz.addEventListener("dragover", (e)=>{ e.preventDefault(); dz.classList.add("drag"); });
+    dz.addEventListener("dragleave", ()=> dz.classList.remove("drag"));
+    dz.addEventListener("drop", (e)=>{ e.preventDefault(); dz.classList.remove("drag"); addPendingFiles(e.dataTransfer.files); });
+  }
+
+  document.querySelectorAll("[data-remove]").forEach(el=>el.addEventListener("click", ()=>removePending(el.dataset.remove)));
+  document.querySelectorAll("[data-type-for]").forEach(el=>el.addEventListener("change", (e)=>setPendingType(el.dataset.typeFor, e.target.value)));
+
+  const submitBtn = document.getElementById("submitBtn");
+  if(submitBtn) submitBtn.addEventListener("click", submitNomination);
+
+  document.querySelectorAll("[data-open]").forEach(el=>el.addEventListener("click", ()=>openDetail(el.dataset.open)));
+  document.querySelectorAll("[data-del]").forEach(el=>el.addEventListener("click", (e)=>{ e.stopPropagation(); removeSubmission(el.dataset.del); }));
+  const clearBtn = document.getElementById("clearAllBtn");
+  if(clearBtn) clearBtn.addEventListener("click", clearAll);
+
+  const closeBtn = document.getElementById("closeModal");
+  if(closeBtn) closeBtn.addEventListener("click", closeDetail);
+  const overlay = document.getElementById("overlay");
+  if(overlay) overlay.addEventListener("click", (e)=>{ if(e.target.id==="overlay") closeDetail(); });
+}
+function syncBtn(){
+  const btn = document.getElementById("submitBtn");
+  if(btn) btn.disabled = state.pending.length===0 || state.processing;
+}
+
+// ---------- init ----------
+(async function init(){
+  render();
+  try{ state.submissions = await loadIndex(); }catch(e){ state.submissions = []; }
+  render();
+})();
+</script>
+</body>
+</html>
