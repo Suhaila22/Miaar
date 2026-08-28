@@ -1,0 +1,1 @@
+ALTER TABLE `award_samples` ADD `tagsJson` text;

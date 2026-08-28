@@ -1,0 +1,1 @@
+ALTER TABLE `judge_assignments` ADD `dueAt` timestamp;

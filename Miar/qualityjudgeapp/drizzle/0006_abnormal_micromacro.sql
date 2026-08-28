@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `trialAttempts` int DEFAULT 0 NOT NULL;

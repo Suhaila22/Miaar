@@ -1,0 +1,21 @@
+CREATE TABLE `award_samples` (
+	`id` varchar(64) NOT NULL,
+	`nameAr` text NOT NULL,
+	`nameEn` text NOT NULL,
+	`organizationAr` text NOT NULL,
+	`organizationEn` text NOT NULL,
+	`programType` varchar(32) NOT NULL,
+	`score` int NOT NULL,
+	`tier` varchar(16) NOT NULL,
+	`awardAr` text NOT NULL,
+	`awardEn` text NOT NULL,
+	`summaryAr` text NOT NULL,
+	`summaryEn` text NOT NULL,
+	`rationaleAr` text NOT NULL,
+	`rationaleEn` text NOT NULL,
+	`metricsJson` text NOT NULL,
+	`isIllustrative` int NOT NULL DEFAULT 1,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `award_samples_id` PRIMARY KEY(`id`)
+);

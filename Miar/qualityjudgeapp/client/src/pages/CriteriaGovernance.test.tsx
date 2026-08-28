@@ -1,0 +1,12 @@
+// @vitest-environment jsdom
+import React from "react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+const { languageState, criteriaState, updateMock } = vi.hoisted(() => ({ languageState: { current: "en" as "ar" | "en" }, criteriaState: { current: [] as any[], error: undefined as any }, updateMock: vi.fn() }));
+vi.mock("@/components/DashboardLayout", () => ({ useLang: () => ({ lang: languageState.current, t: {} }) }));
+vi.mock("@/_core/hooks/useAuth", () => ({ useAuth: () => ({ user: { id: 1, role: "admin" } }) }));
+vi.mock("@/lib/trpc", () => ({ trpc: { useUtils: () => ({ evaluation: { governedCriteria: { invalidate: vi.fn() } } }), evaluation: { governedCriteria: { useQuery: () => ({ data: criteriaState.current, isLoading: false, error: criteriaState.error }) }, updateGovernedCriterionStatus: { useMutation: (options: any) => ({ mutate: (input: any) => { updateMock(input); options?.onSuccess?.(); }, isPending: false }) } } } }));
+import CriteriaGovernance from "./CriteriaGovernance";
+afterEach(() => cleanup());
+beforeEach(() => { languageState.current = "en"; criteriaState.error = undefined; criteriaState.current = [{ id: "gc-1", awardId: "award-1", awardTitle: { ar: "جائزة التميز", en: "Excellence Award" }, criterionKey: "impact", name: { ar: "الأثر", en: "Impact" }, description: { ar: "", en: "" }, weight: 20, evidenceRequired: true, evidenceRequirements: { ar: "تقرير أثر معتمد.", en: "Approved impact report." }, kpi: { ar: "رضا المستفيدين", en: "Beneficiary satisfaction" }, version: 2, ownerUserId: 1, status: "draft", approvedAt: null }]; updateMock.mockReset(); });
+describe("CriteriaGovernance", () => { it("renders metadata and approves a governed version", () => { render(<CriteriaGovernance />); expect(screen.getByRole("heading", { name: "Criteria & Version Governance" })).toBeDefined(); expect(screen.getByText("Impact")).toBeDefined(); expect(screen.getByText("Approved impact report.")).toBeDefined(); expect(screen.getByText("Beneficiary satisfaction")).toBeDefined(); fireEvent.click(screen.getByRole("button", { name: "Approve version" })); expect(updateMock).toHaveBeenCalledWith({ id: "gc-1", status: "approved" }); }); it("renders the Arabic empty state", () => { languageState.current = "ar"; criteriaState.current = []; render(<CriteriaGovernance />); expect(screen.getByRole("heading", { name: "إدارة المعايير وإصداراتها" })).toBeDefined(); expect(screen.getByText(/لا توجد معايير محكومة/)).toBeDefined(); }); });

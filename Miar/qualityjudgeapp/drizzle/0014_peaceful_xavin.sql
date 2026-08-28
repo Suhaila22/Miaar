@@ -1,0 +1,23 @@
+CREATE TABLE `governed_criteria` (
+	`id` varchar(64) NOT NULL,
+	`awardId` varchar(64) NOT NULL,
+	`criterionKey` varchar(128) NOT NULL,
+	`nameAr` text NOT NULL,
+	`nameEn` text NOT NULL,
+	`descriptionAr` text,
+	`descriptionEn` text,
+	`weight` int NOT NULL,
+	`evidenceRequired` int NOT NULL DEFAULT 1,
+	`evidenceRequirementsAr` text NOT NULL,
+	`evidenceRequirementsEn` text NOT NULL,
+	`kpiAr` text,
+	`kpiEn` text,
+	`version` int NOT NULL DEFAULT 1,
+	`ownerUserId` int NOT NULL,
+	`status` enum('draft','approved','retired') NOT NULL DEFAULT 'draft',
+	`approvedAt` timestamp,
+	`approvedByUserId` int,
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `governed_criteria_id` PRIMARY KEY(`id`)
+);

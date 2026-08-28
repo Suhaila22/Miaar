@@ -1,0 +1,1 @@
+ALTER TABLE `nominations` ADD `programType` varchar(32) DEFAULT 'excellence' NOT NULL;

@@ -1,0 +1,101 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+:root {
+  --background: #f4f7f8;
+  --foreground: #16212b;
+  --card: #ffffff;
+  --card-foreground: #16212b;
+  --popover: #ffffff;
+  --popover-foreground: #16212b;
+  --primary: #0b2140;
+  --primary-foreground: #ffffff;
+  --secondary: #e4f3f1;
+  --secondary-foreground: #12897f;
+  --muted: #eef1f3;
+  --muted-foreground: #61717d;
+  --accent: #fbf3dc;
+  --accent-foreground: #8a6d14;
+  --destructive: #b94a48;
+  --destructive-foreground: #ffffff;
+  --border: #dfe8e9;
+  --input: #dfe8e9;
+  --ring: #12897f;
+  --radius: 0.85rem;
+  --sidebar: #0b2140;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #12897f;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(255,255,255,.10);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255,255,255,.10);
+  --sidebar-ring: #c9a227;
+}
+
+* { box-sizing: border-box; }
+html { min-width: 320px; background: var(--background); }
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "IBM Plex Sans Arabic", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+button:active { transform: scale(.985); }
+::selection { background: #c9a227; color: #0b2140; }
+
+.font-mono, code, .tabular-nums { font-family: "IBM Plex Mono", monospace; }
+.soft-grid {
+  background-image: linear-gradient(rgba(11,33,64,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(11,33,64,.035) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fade-up { animation: fade-up .45s cubic-bezier(.23,1,.32,1) both; }
+  .stagger-1 { animation-delay: 50ms; }
+  .stagger-2 { animation-delay: 100ms; }
+  .stagger-3 { animation-delay: 150ms; }
+  @keyframes fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 3px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+}
+
+@media print {
+  @page { size: A4; margin: 12mm; }
+  body { background: #ffffff !important; }
+  body * { visibility: hidden !important; }
+  .print-report-shell, .print-report-shell *, .print-leaderboard-shell, .print-leaderboard-shell * { visibility: visible !important; }
+  .print-leaderboard-shell { position: static !important; display: block !important; overflow: visible !important; background: #ffffff !important; padding: 0 !important; }
+  .print-leaderboard-shell button, .print-leaderboard-shell input, .print-leaderboard-shell select { display: none !important; }
+  .print-report-shell { position: static !important; display: block !important; overflow: visible !important; background: #ffffff !important; padding: 0 !important; }
+  .print-report-card { width: 100% !important; max-width: none !important; margin: 0 !important; overflow: visible !important; box-shadow: none !important; border-radius: 0 !important; }
+  .print-report-card button { display: none !important; }
+  .print-report-card .rounded-2xl { break-inside: avoid; }
+}

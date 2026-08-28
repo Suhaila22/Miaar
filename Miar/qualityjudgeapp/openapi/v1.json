@@ -1,0 +1,91 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Mi'yar Institutional Platform API",
+    "version": "1.0.0",
+    "description": "Versioned read-mostly REST API exposed alongside the primary tRPC API, for external institutional system integration (BI dashboards, ERP/HR/DMS connectors, server-to-server polling). Authenticate with the session cookie or an `Authorization: Bearer <token>` header using the same JWT session token issued by /api/trpc/auth.login."
+  },
+  "servers": [{ "url": "/api/v1" }],
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": { "type": "apiKey", "in": "cookie", "name": "session" },
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    }
+  },
+  "security": [{ "cookieAuth": [] }, { "bearerAuth": [] }],
+  "paths": {
+    "/awards": {
+      "get": {
+        "summary": "List the published award catalog",
+        "security": [],
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
+    "/awards/{id}": {
+      "get": {
+        "summary": "Get a single award's catalog record",
+        "security": [],
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "OK" }, "404": { "description": "Not found" } }
+      }
+    },
+    "/nominations": {
+      "get": {
+        "summary": "List the authenticated user's own nominations",
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/nominations/{id}": {
+      "get": {
+        "summary": "Get a single nomination owned by the authenticated user",
+        "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "OK" }, "404": { "description": "Not found" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/eligibility/{awardId}": {
+      "get": {
+        "summary": "Get the authenticated user's latest eligibility-check result for an award",
+        "parameters": [{ "name": "awardId", "in": "path", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/calendar": {
+      "get": {
+        "summary": "List award calendar milestones",
+        "parameters": [{ "name": "awardId", "in": "query", "required": false, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/committees": {
+      "get": {
+        "summary": "List judging committees",
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/corrective-actions": {
+      "get": {
+        "summary": "List corrective actions (own actions, or all actions for admins)",
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/reference-data": {
+      "get": {
+        "summary": "List versioned reference data (categories/sectors/levels/KPIs)",
+        "parameters": [{ "name": "type", "in": "query", "required": false, "schema": { "type": "string", "enum": ["category", "sector", "level", "kpi"] } }],
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/ai-governance/logs": {
+      "get": {
+        "summary": "List AI-output governance log entries (admin only)",
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "403": { "description": "Forbidden" } }
+      }
+    },
+    "/security/events": {
+      "get": {
+        "summary": "List SIEM-ready security events (admin only)",
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" }, "403": { "description": "Forbidden" } }
+      }
+    }
+  }
+}
